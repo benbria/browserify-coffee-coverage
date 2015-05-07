@@ -1,0 +1,39 @@
+{
+  "name": "browserify-coffee-coverage",
+  "version": "1.0.0",
+  "description": "Browserify transform to instrument coffee src files with JSCoverage or Istanbul instrumentation",
+  "main": "index.js",
+  "scripts": {
+    "build-test": "mkdir -p build-test && ./node_modules/.bin/browserify -t [ ./index.js --instrumentor=istanbul ] karma-test/index.js -o ./build-test/bundle.js",
+    "test-i": "./node_modules/.bin/mocha mocha-test/**/*Test.js",
+    "test-k": "npm run build-test && ./node_modules/karma/bin/karma start --single-run && ./node_modules/.bin/mocha karma-test/verify.js && rm -rf coverage",
+    "test": "npm run test-i && npm run test-k"
+  },
+  "keywords": [
+    "istanbul",
+    "jscoverage",
+    "coverage",
+    "browserify",
+    "coffee-script"
+  ],
+  "author": "Benbria",
+  "license": "MIT",
+  "dependencies": {
+    "coffee-coverage": "^0.5.2",
+    "coffee-script": "^1.9.2",
+    "istanbul": "^0.3.13",
+    "minimatch": "^2.0.7",
+    "through2": "^0.6.5"
+  },
+  "devDependencies": {
+    "browserify": "^10.0.0",
+    "chai": "^2.3.0",
+    "istanbul": "^0.3.13",
+    "karma": "^0.12.31",
+    "karma-chai": "^0.1.0",
+    "karma-chrome-launcher": "^0.1.8",
+    "karma-coverage": "0.2.5",
+    "karma-mocha": "^0.1.10",
+    "mocha": "^2.2.4"
+  }
+}
