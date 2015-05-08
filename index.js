@@ -18,7 +18,11 @@ var defaultIgnore = [
  * Transform coffee source into javascript with either JScoverage or Istanbul style instrumentation
  *
  * `options` {Object} - all options that can be passed to this
- * [function](https://github.com/benbria/coffee-coverage/blob/v0.5.4/src/coffeeCoverage.coffee#L270)
+ * [function](https://github.com/benbria/coffee-coverage/blob/v0.5.4/src/coffeeCoverage.coffee#L270) plus these:
+ *
+ * `options.ignore` {Array} - file patterns to not instrument
+ * `options.noInit` {Boolean} - default to `false`. Use this if you do not want the initialization (which adds the file
+ * being transformed to the global coverage object). There may be cases where you'd want to control this.
  */
 module.exports = function(file, options) {
     if (!options) options = {};
@@ -53,7 +57,8 @@ module.exports = function(file, options) {
         }
         else {
             var instrumented = instrumentor.instrumentCoffee(file, code);
-            transformed = new Buffer(instrumented.init + instrumented.js);
+            var js = options.noInit ? instrumented.js : instrumented.init + instrumented.js;
+            transformed = new Buffer(js);
         }
         cb(null, transformed);
     }
