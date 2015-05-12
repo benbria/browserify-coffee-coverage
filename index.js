@@ -1,3 +1,4 @@
+'use strict';
 var path = require('path');
 var through = require('through2');
 var coffee = require('coffee-script');
@@ -25,11 +26,12 @@ var defaultIgnore = [
  * being transformed to the global coverage object). There may be cases where you'd want to control this.
  */
 module.exports = function(file, options) {
+    var ignore, instrumentor;
     if (!options) options = {};
-    options.coverageVar = COVERAGE_VAR;
-    var ignore = defaultIgnore.concat(options.ignore || []);
+    options.coverageVar = options.coverageVar || COVERAGE_VAR;
+    ignore = defaultIgnore.concat(options.ignore || []);
     options.ignore = null;
-    var instrumentor = new CoverageInstrumentor(options);
+    instrumentor = new CoverageInstrumentor(options);
 
     /**
      * if it isn't coffee, we can't do anything with it
