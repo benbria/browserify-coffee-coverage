@@ -7,7 +7,7 @@ var minimatch = require('minimatch');
 
 var CoverageInstrumentor = coffeeCoverage.CoverageInstrumentor;
 // Just use the default Istanbul coverage variable.
-var COVERAGE_VAR = '__coverage__';
+var ISTANBUL_COVERAGE_VAR = '__coverage__';
 var defaultIgnore = [
     '**/node_modules/**',
     '**/bower_components/**',
@@ -28,7 +28,9 @@ var defaultIgnore = [
 module.exports = function(file, options) {
     var ignore, instrumentor;
     if (!options) options = {};
-    options.coverageVar = options.coverageVar || COVERAGE_VAR;
+    if (!options.coverageVar && options.instrumentor === 'istanbul') {
+        options.coverageVar = ISTANBUL_COVERAGE_VAR;
+    }
     ignore = defaultIgnore.concat(options.ignore || []);
     options.ignore = null;
     instrumentor = new CoverageInstrumentor(options);
