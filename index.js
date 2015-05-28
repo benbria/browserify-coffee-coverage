@@ -4,6 +4,7 @@ var through = require('through2');
 var coffee = require('coffee-script');
 var coffeeCoverage = require('coffee-coverage');
 var minimatch = require('minimatch');
+var assign = require('object-assign');
 
 var CoverageInstrumentor = coffeeCoverage.CoverageInstrumentor;
 // Just use the default Istanbul coverage variable.
@@ -25,9 +26,10 @@ var defaultIgnore = [
  * `options.noInit` {Boolean} - default to `false`. Use this if you do not want the initialization (which adds the file
  * being transformed to the global coverage object). There may be cases where you'd want to control this.
  */
-module.exports = function(file, options) {
-    var ignore, instrumentor;
-    if (!options) options = {};
+module.exports = function(file, passedOptions) {
+    var ignore, instrumentor,
+    options = {};
+    if (passedOptions) assign(options, passedOptions);
     if (!options.coverageVar && options.instrumentor === 'istanbul') {
         options.coverageVar = ISTANBUL_COVERAGE_VAR;
     }
