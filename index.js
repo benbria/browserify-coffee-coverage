@@ -33,6 +33,7 @@ module.exports = function(file, passedOptions) {
     if (!options.coverageVar && options.instrumentor === 'istanbul') {
         options.coverageVar = ISTANBUL_COVERAGE_VAR;
     }
+    if (typeof options.bare === 'undefined') options.bare = true;
     ignore = defaultIgnore.concat(options.ignore || []);
     options.ignore = null;
     instrumentor = new CoverageInstrumentor(options);
@@ -57,6 +58,7 @@ module.exports = function(file, passedOptions) {
                 sourceMap: true,
                 generatedFile: file,
                 inline: true,
+                bare: options.bare,
                 literate: false
             });
             transformed = new Buffer(data.js);
