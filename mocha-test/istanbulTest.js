@@ -2,25 +2,11 @@ var expect = require('chai').expect;
 var browserify = require('browserify');
 var fs = require('fs');
 var path = require('path');
-var vm = require('vm');
 
 var coverage = require('../');
+var execute = require('./utils').execute;
 
-/**
- * Execute the instrumented javascript in its own context to verify the coverage results are valid.
- */
-function execute(src) {
-    var ctx = {};
-    try {
-        vm.runInNewContext(src, ctx);
-    } catch (err) {
-        console.log('Error thrown while executing instrumented code');
-        console.error(err);
-    }
-    return ctx;
-}
-
-describe('Test istanbul instrumentation', function() {
+describe('Istanbul instrumentation', function() {
     it('should instrument foo.coffee and mark if branch as ran', function(cb) {
         var b = browserify();
         b.add('./testFixtures/if.coffee');

@@ -2,9 +2,9 @@ var expect = require('chai').expect;
 var browserify = require('browserify');
 var fs = require('fs');
 var path = require('path');
-var vm = require('vm');
 
 var coverage = require('../');
+var execute = require('./utils').execute;
 
 /**
  * Execute the instrumented javascript in its own context to verify the coverage results are valid.
@@ -20,7 +20,7 @@ function execute(src) {
     return ctx;
 }
 
-describe('Test Edge Cases', function() {
+describe('Edge Cases', function() {
     describe('non coffee files', function() {
         it('should pass through js src', function(cb) {
             var b = browserify();
