@@ -19,7 +19,7 @@
     "url": "https://github.com/benbria/browserify-coffee-coverage.git"
   },
   "dependencies": {
-    "coffee-coverage": "^0.5.2",
+    "coffee-coverage": "^0.6.2",
     "coffee-script": "^1.9.2",
     "minimatch": "^2.0.7",
     "object-assign": "^2.0.0",
