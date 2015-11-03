@@ -1,6 +1,6 @@
 'use strict';
 var path = require('path');
-var through = require('through2');
+var through = require('through');
 var coffee = require('coffee-script');
 var coffeeCoverage = require('coffee-coverage');
 var minimatch = require('minimatch');
@@ -17,6 +17,18 @@ var defaultIgnore = [
 ];
 
 /**
+ * borrowed from https://github.com/substack/coffeeify/blob/master/index.js
+ */
+
+function isCoffee (file) {
+    return /\.((lit)?coffee|coffee\.md)$/.test(file);
+}
+
+function isLiterate (file) {
+    return /\.(litcoffee|coffee\.md)$/.test(file);
+}
+
+/**
  * Transform coffee source into javascript with either JScoverage or Istanbul style instrumentation
  *
  * `options` {Object} - all options that can be passed to this
@@ -27,49 +39,48 @@ var defaultIgnore = [
  * being transformed to the global coverage object). There may be cases where you'd want to control this.
  */
 module.exports = function(file, passedOptions) {
-    var ignore, instrumentor,
-    options = {};
+    if (!isCoffee(file)) return through();
+
+    var options = {};
     if (passedOptions) assign(options, passedOptions);
     if (!options.coverageVar && options.instrumentor === 'istanbul') {
         options.coverageVar = ISTANBUL_COVERAGE_VAR;
     }
     if (typeof options.bare === 'undefined') options.bare = true;
-    ignore = defaultIgnore.concat(options.ignore || []);
+    var ignore = defaultIgnore.concat(options.ignore || []);
     options.ignore = null;
-    instrumentor = new CoverageInstrumentor(options);
+    var instrumentor = new CoverageInstrumentor(options);
+
+    var data = '';
+    return through(write, end);
+
+    function write(buf) { data += buf; }
 
     /**
-     * if it isn't coffee, we can't do anything with it
-     *
      * If in the list of ignored paths, don't instrument, just coffeeify. We do this here instead of in
      * coffee-coverage, as coffee-coverage works on the file system. Since we are getting piped the files,
      * we bypass coffee-coverage's filesystem code.
      *
      * else instrument and coffeeify (which is done by coffee-coverage)
      */
-    function instrument(buf, enc, cb) {
-        var transformed,
-        code = buf.toString('utf8');
-        if (!/coffee/.test(path.extname(file))) {
-            transformed = buf;
-        }
-        else if (ignore.some(minimatch.bind(null, file))) {
-            var data = coffee.compile(code, {
+     function end() {
+        var transformed;
+        if (ignore.some(minimatch.bind(null, file))) {
+            var compiled = coffee.compile(data, {
                 sourceMap: true,
                 generatedFile: file,
                 inline: true,
                 bare: options.bare,
-                literate: false
+                literate: isLiterate(file)
             });
-            transformed = new Buffer(data.js);
+            transformed = compiled.js;
         }
         else {
-            var instrumented = instrumentor.instrumentCoffee(file, code);
+            var instrumented = instrumentor.instrumentCoffee(file, data);
             var js = options.noInit ? instrumented.js : instrumented.init + instrumented.js;
-            transformed = new Buffer(js);
+            transformed = js;
         }
-        cb(null, transformed);
+        this.queue(transformed);
+        this.queue(null);
     }
-
-    return through.obj(instrument);
 }
