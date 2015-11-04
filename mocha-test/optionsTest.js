@@ -34,4 +34,38 @@ describe('Options', function() {
             });
         });
     });
+
+    describe('literate coffee', function () {
+        it('should compile .litcoffee files', function(cb) {
+            var b = browserify();
+            b.add('./testFixtures/foo.litcoffee');
+            b.transform(coverage, {
+                instrumentor: 'istanbul'
+            });
+            b.bundle(function(err, buf) {
+                if (err) return cb(err);
+                var results = execute(buf);
+                var entry = path.resolve(__dirname + '/../testFixtures/foo.litcoffee');
+                expect(results.__coverage__[entry]).to.be.ok;
+                expect(results.__coverage__[entry].s[3]).to.eq(1);
+                cb()
+            });
+        });
+
+        it('should compile .coffee.md files', function(cb) {
+            var b = browserify();
+            b.add('./testFixtures/bar.coffee.md');
+            b.transform(coverage, {
+                instrumentor: 'istanbul'
+            });
+            b.bundle(function(err, buf) {
+                if (err) return cb(err);
+                var results = execute(buf);
+                var entry = path.resolve(__dirname + '/../testFixtures/bar.coffee.md');
+                expect(results.__coverage__[entry]).to.be.ok;
+                expect(results.__coverage__[entry].s[3]).to.eq(1);
+                cb()
+            });
+        });
+    });
 });
